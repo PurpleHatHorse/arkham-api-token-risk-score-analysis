@@ -46,7 +46,7 @@ pip install -r requirements.txt
 Create `.env` file:
 ```env
 ARKHAM_API_KEY=your_api_key_here
-TARGET_TOKEN=EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm
+TOKENS=EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm
 TOKEN_SYMBOL=WIF
 CHAIN=solana
 TIME_RANGE=30d
@@ -57,16 +57,7 @@ MAX_TRANSFERS=5000
 ### 4. Run Analysis
 ```bash
 # Step 1: Collect data
-python scripts/collect_data.py
-
-# Step 2: Process data
-python scripts/process_data.py WIF_solana_30d_YYYYMMDD_HHMMSS.json
-
-# Step 3: Detect wash trading
-python analysis/detect_wash_trading.py WIF_solana_30d_YYYYMMDD_HHMMSS_processed.csv
-
-# Step 4: Generate visualizations
-python analysis/visualize_results.py WIF_solana_30d_YYYYMMDD_HHMMSS_processed.csv
+python analyze_data.py
 ```
 
 ## 📁 Project Structure
