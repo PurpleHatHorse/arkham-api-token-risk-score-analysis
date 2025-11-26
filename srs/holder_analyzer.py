@@ -136,7 +136,7 @@ class HolderAnalyzer:
         print(f"\n[3/3] Analyzing AMM Liquidity (Top 100)...")
 
         top_100 = self.df_holders.head(100)
-        target_amms = ['Orca', 'Raydium', 'Meteora', 'Uniswap', 'PancakeSwap']
+        target_amms = ['Orca', 'Raydium', 'Meteora']
         mask = top_100['Label'].str.contains('|'.join(target_amms), case=False, na=False)
         target_lps = top_100[mask]
 
@@ -171,14 +171,17 @@ class HolderAnalyzer:
 
             results.append({
                 "AMM": label,
-                "Pool Value": f"${row['USD Value']:,.0f}",
-                "Identified Pair": pair_str
+                "Address": address,
+                "Identified Pair": pair_str,
+                "Pool USD": "${:,.2f}".format(row['USD Value'])
             })
 
             time.sleep(0.2) # Small delay for aesthetics/rate-limit safety
 
         if results:
-            print("\n  IDENTIFIED LIQUIDITY PAIRS:")
+            print("\n" + "-"*70)
+            print("IDENTIFIED LIQUIDITY PAIRS:")
+            print("-"*70)
             df_res = pd.DataFrame(results)
             print(df_res.to_string(index=False))
             print("="*70)

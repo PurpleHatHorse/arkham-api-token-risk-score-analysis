@@ -76,7 +76,7 @@ def analyze_token(token_address: str):
     # Step 5: full risk score analysis
     print("\n[5/5] RISK SCORE ANALYSIS")
     risk_score = RiskScoreAnalyzer(wash_detector, bot_detector, token_name)
-    risk_score.create_risk_score_analysis(holder_concentration_metrics, top_holders_list)
+    risk_score.create_risk_analysis(holder_concentration_metrics, top_holders_list)
 
     # Save
     os.makedirs(f"{config.OUTPUT_DIR}/risk_score_analysis", exist_ok=True)
