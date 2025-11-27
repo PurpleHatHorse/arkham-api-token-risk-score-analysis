@@ -24,16 +24,6 @@ except ImportError:
 class LiveDataFetcher:
     """Fetch live transfer data from Arkham API"""
     
-    # Token name mappings for display purposes
-    TOKEN_NAMES = {
-        'EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm': 'WIF',
-        'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263': 'BONK',
-        '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr': 'POPCAT',
-        'MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5': 'MEW',
-        'HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3': 'PYTH',
-        'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN': 'JUP',
-    }
-    
     def __init__(self, api_key: str = None):
         # Unify: Use passed key or fall back to config
         self.api_key = api_key or config.ARKHAM_API_KEY
@@ -47,12 +37,20 @@ class LiveDataFetcher:
     
     def _get_token_display_name(self, contract_address: str) -> str:
         """Get friendly name for token, fallback to shortened address"""
-        if contract_address in self.TOKEN_NAMES:
-            return self.TOKEN_NAMES[contract_address]
-        return f"{contract_address[:4]}...{contract_address[-4:]}"
+        url = f"{self.base_url}/intelligence/address/{contract_address}"
+        params = {"chain": config.CHAIN}
 
-    # ... [KEEP YOUR EXISTING fetch_token_transfers AND process_transfers_to_user_flows HERE] ...
-    # ... [DO NOT DELETE EXISTING METHODS] ...
+        try:
+            response = requests.get(url, headers=self.headers, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            token_name = data['arkhamEntity']['name']
+            print(f"✓ Successfully fetched token name")
+            return token_name.upper()
+        except requests.exceptions.RequestException as e:
+            print(f"✗ Error fetching token name: {e}")
+            return f"{contract_address[:4]}...{contract_address[-4:]}"
+
     def fetch_token_transfers(self, 
                              token_address: str,
                              chain: str = "solana",
@@ -289,10 +287,6 @@ class LiveDataFetcher:
             print(f"⚠ Self-transfers detected: {self_transfers}")
         
         return user_flows_df
-
-    # ==========================================
-    # NEW METHODS FROM APP.PY
-    # ==========================================
 
     def fetch_token_holders(self, token_address: str, chain: str = "solana") -> Optional[Dict[str, Any]]:
         """
