@@ -5,6 +5,7 @@ Unified Token Analysis - Live API Version
 import sys
 import os
 from pathlib import Path
+import subprocess, shutil
 
 # Setup paths
 target_directory_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "srs"))
@@ -87,7 +88,51 @@ def analyze_token(token_address: str):
     return risk_score
 
 
+def clean_folders():
+    """
+    Completely removes the specified directories and all their contents
+    to ensure a clean state before the analysis runs.
+    """
+    FOLDERS_TO_CLEAN = ['data', 'outputs']
+    print("--- Cleaning up directories ---")
+    
+    for folder in FOLDERS_TO_CLEAN:
+        if os.path.exists(folder):
+            try:
+                # rmtree deletes the folder and everything inside it
+                shutil.rmtree(folder)
+                print(f"✅ Removed folder: {folder}")
+            except Exception as e:
+                print(f"❌ Error removing {folder}: {e}")
+        else:
+            print(f"ℹ️  Folder not found (skipped): {folder}")
+            
+    print("--- Cleanup Complete ---")
+
+
+def launch_dashboard():
+    """
+    Launches the Streamlit dashboard using a subprocess.
+    """
+    print("--- Launching Dashboard ---")
+    
+    # ensure dashboard.py exists
+    dashboard_file = "dashboard.py"
+    
+    if not os.path.exists(dashboard_file):
+        print(f"Error: {dashboard_file} not found.")
+        return
+
+    # This is equivalent to typing "streamlit run dashboard.py" in the terminal
+    try:
+        # sys.executable ensures we use the same python interpreter (and installed packages)
+        subprocess.run([sys.executable, "-m", "streamlit", "run", dashboard_file])
+    except KeyboardInterrupt:
+        print("\nDashboard stopped by user.")
+
+
 def main():
+    clean_folders()
     print("\n" + "="*70)
     print("LIVE API TOKEN ANALYSIS")
     print("="*70 + "\n")
@@ -111,6 +156,8 @@ def main():
             traceback.print_exc()
 
     print("\n✅ Done!")
+    # Run dashboard
+    launch_dashboard()
 
 
 if __name__ == "__main__":
